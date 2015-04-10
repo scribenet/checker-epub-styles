@@ -59,10 +59,18 @@ class EpubStylesChecker
   end
 end
 
+$message = 'The following styles are classes in your HTML files but are not represented in the CSS:'
+
+def write_to_log(epub, missing)
+  File.open("#{epub}.missing_styles.log",'w') do |f|
+    f.write($message)
+    f.write("\n")
+    f.write(missing.join("\n"))
+  end
+end
+
 Dir.glob('*.epub').each do |epub|
   checker = EpubStylesChecker.new(epub)
   missing = checker.check
-  File.open("#{epub}.missing_styles.log",'w') do |f|
-    f.write(missing.join("\n"))
-  end
+  write_to_log(epub, missing)
 end
