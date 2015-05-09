@@ -60,6 +60,7 @@ class EpubStylesChecker
 end
 
 $message = 'The following styles are classes in your HTML files but are not represented in the CSS:'
+$quiet = false
 
 def write_to_log(epub, missing)
   File.open("#{epub}.missing_styles.log",'w') do |f|
@@ -69,8 +70,28 @@ def write_to_log(epub, missing)
   end
 end
 
+def write_to_std(epub, missing)
+  if $quiet != true
+    puts "\n+-------------------------------"
+    puts "|"
+    puts "|  E-Pub Filename: #{epub}"
+    puts "|"
+    puts "|  Missing Styles Count   : #{missing.length}"
+    if missing.length > 0
+      puts "|  Missing Styles Listing :"
+      missing.each do |css|
+        puts "|  - #{css}"
+      end
+    end
+    puts "|"
+    puts "+-------------------------------\n\n"
+    puts "Log file written to: #{epub}.missing_styles.log\n\n"
+  end
+end
+
 Dir.glob('*.epub').each do |epub|
   checker = EpubStylesChecker.new(epub)
   missing = checker.check
   write_to_log(epub, missing)
+  write_to_std(epub, missing)
 end
